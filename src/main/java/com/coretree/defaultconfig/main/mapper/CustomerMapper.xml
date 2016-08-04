@@ -16,7 +16,7 @@
     </resultMap>
 	
     <select id="selectCustomerList" parameterType="com.coretree.defaultconfig.main.model.Customer"  resultMap="resultMap">
-		SELECT FIRST 2000 CUST_CD,
+		SELECT FIRST 1 CUST_CD,
 			      (SELECT * FROM GET_CODE_NAME('1008',CUST_CD) p) as CUST_CDNM,
 			      CUST_NO,
 			      CUST_NM,
