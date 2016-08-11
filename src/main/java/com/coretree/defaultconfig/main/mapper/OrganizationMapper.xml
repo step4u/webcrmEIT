@@ -1,0 +1,57 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coretree.defaultconfig.main.mapper.OrganizationMapper">
+	
+    <resultMap id="resultMap" type="com.coretree.defaultconfig.main.model.Organization">
+        <result property="password"		column="PASSWORD" />
+        <result property="empNo"			column="EMP_NO" />
+        <result property="empNm"			column="EMP_NM" />
+        <result property="authCd"			column="AUTH_CD" />
+        <result property="extensionNo"			column="EXTENSION_NO" />
+        <result property="existCount"		column="EXIST_COUNT" />
+    </resultMap>
+	
+    <resultMap id="resultMap2" type="com.coretree.defaultconfig.main.model.Organization">
+        <result property="empNm"		column="USERNAME" />
+        <result property="extensionNo"			column="EXTENSION" />
+        <result property="state"			column="STATE" />
+    </resultMap>
+	
+    <select id="checkLogin" parameterType="com.coretree.defaultconfig.main.model.Organization"  resultMap="resultMap">
+    	SELECT  PASSWORD,
+    				EMP_NO,
+    				EMP_NM,
+    				AUTH_CD,
+    				EXTENSION_NO,
+    				count(*) EXIST_COUNT
+       FROM TORGANIZATION
+       WHERE EMP_NO = #{empNo}
+       GROUP BY PASSWORD, EMP_NO,EMP_NM,AUTH_CD,EXTENSION_NO
+    </select>
+    
+    <update  id="updatePwd" parameterType="com.coretree.defaultconfig.main.model.Organization">
+    	UPDATE TORGANIZATION
+    	SET PASSWORD = #{newPwd}
+        WHERE EMP_NO = #{empNo}
+    </update>
+
+    <select id="empList"  resultType="com.coretree.defaultconfig.main.model.Organization">
+    	SELECT  EMP_NO as empNo,
+    				EMP_NM as empNm
+       FROM TORGANIZATION
+    </select>	
+    
+    <select id="usersState" resultMap="resultMap2" >
+    	SELECT a.USERNAME		
+			        ,EXTENSION	
+					,STATE
+		FROM USERS a, USERS_EXTS b
+		WHERE a.USERNAME = b.USERNAME
+        ORDER BY USERNAME
+        <!-- SELECT a.USERNAME		
+			        ,EXTENSION	
+					,STATE
+		FROM USERS a right join USERS_EXTS b
+        on a.USERNAME = b.USERNAME
+        ORDER BY USERNAME -->
+    </select>
+</mapper>
