@@ -3,6 +3,7 @@ package com.coretree.defaultconfig.azure;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.cypher.internal.compiler.v2_2.perty.gen.toStringDocGen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.core.MessageSendingOperations;
@@ -30,12 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coretree.defaultconfig.main.mapper.CallbackMapper;
 import com.coretree.defaultconfig.main.model.Callback;
+import com.coretree.defaultconfig.main.model.Organization;
 import com.coretree.defaultconfig.mapper.Call;
 import com.coretree.defaultconfig.mapper.CallMapper;
 import com.coretree.defaultconfig.mapper.Customer2;
 import com.coretree.defaultconfig.mapper.Customer2Mapper;
 import com.coretree.defaultconfig.mapper.Member;
 import com.coretree.defaultconfig.mapper.MemberMapper;
+import com.coretree.defaultconfig.main.mapper.OrganizationMapper;
 import com.coretree.defaultconfig.mapper.SmsMapper_sample;
 import com.coretree.defaultconfig.mapper.Sms_sample;
 import com.coretree.event.HaveGotUcMessageEventArgs;
@@ -68,8 +72,10 @@ public class WebUcService implements
     @Autowired
     private WebUcServiceConfig configs;
 
+//	@Autowired
+//	private MemberMapper memberMapper;
 	@Autowired
-	private MemberMapper memberMapper;
+	private OrganizationMapper organizationMapper;	
 	@Autowired
 	private Customer2Mapper custMapper;
 	@Autowired
@@ -84,7 +90,7 @@ public class WebUcService implements
 	//private Principal pInfo;
 	
 	private List<Call> curcalls = new ArrayList<Call>();
-	private List<Member> userstate = new ArrayList<Member>();
+	private List<Organization> organizations = new ArrayList<Organization>();
 	private List<Sms_sample> smsrunning = new ArrayList<Sms_sample>();
 	
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -112,17 +118,16 @@ public class WebUcService implements
 		switch (message.cmd) {
 			case Const4pbx.WS_REQ_EXTENSION_STATE:
 				message.cmd = Const4pbx.WS_RES_EXTENSION_STATE;
-				for (Member m : userstate) {
-					message.extension = m.getExtension();
-					message.status = m.getState();
+				for (Organization m : orgnizations) {
+					message.extension = m.getExtensionNo();
+					message.status = m.getAgentStatCd();
 					this.msgTemplate.convertAndSendToUser(principal.getName(), "/queue/groupware", message);
 				}
 				break;
 			case Const4pbx.WS_REQ_SET_EXTENSION_STATE:
-				Member mem = userstate.stream().filter(x -> x.getExtension().equals(message.extension)).findFirst().get();
+				Organization orgnization = orgnizations.stream().filter(x -> x.getExtensionNo().equals(message.extension)).findFirst().get();
 
-				logger.debug(mem);
-				//message = GetMessage(mem, message.status);
+				logger.debug(orgnization);
 				break;
 			case Const4pbx.WS_REQ_RELOAD_USER:
 				break;
@@ -130,18 +135,18 @@ public class WebUcService implements
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_LEFT:
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_DND:
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_REDIRECTED:
-				Member member;
+				Organization organization;
 				r.lock();
 				try {
-					member = userstate.stream().filter(x -> x.getExtension().equals(message.extension)).findFirst().get();
+					organization = orgnizations.stream().filter(x -> x.getExtensionNo().equals(message.extension)).findFirst().get();
 				} catch (NoSuchElementException | NullPointerException e) {
-					member = null;
+					organization = null;
 				} finally {
 					r.unlock();
 				}
 
 				this.RequestToPbx(message);
-				member.setTempval(message.cmd);
+				organization.setTempval(message.cmd);
 				break;
 				
 			default:
@@ -172,7 +177,7 @@ public class WebUcService implements
 	
 	
 	private void initializeUserState() {
-		userstate = memberMapper.getUserState();
+		organizations = orgnizationMapper.selectLoginUser();
 		sendExtensionStatus();
 	}
 	
@@ -244,9 +249,9 @@ public class WebUcService implements
 				this.PassReportSms(e.getItem());
 				break;
 			case Const4pbx.UC_REPORT_EXT_STATE:
-				for (Member mem : userstate) {
-					if (mem.getExtension().equals(data.getExtension())) {
-						mem.setState(data.getStatus());
+				for (Organization orgnization : organizations) {
+					if (orgnization.getExtensionNo().equals(data.getExtension())) {
+						orgnization.setAgentStatCd(data.getStatus().toString());
 					}
 				}
 				if (data.getCallee().isEmpty()) break;
@@ -287,17 +292,17 @@ public class WebUcService implements
 				if (data.getExtension() == null) return;
 				if (data.getExtension().isEmpty()) return;
 
-				Member mem = memberMapper.selectByExt(data.getExtension());
+				Organization organization = organizationMapper.selectByExt(data.getExtension());
 
-				if (mem.getUsername() == null) return;
-				if (mem.getUsername().isEmpty()) return;
+				if (organization.getEmpNo() == null) return;
+				if (organization.getEmpNm().isEmpty()) return;
 
 				payload = new UcMessage();
 				payload.cmd = data.getCmd();
 				payload.extension = data.getExtension();
 				payload.caller = data.getCaller();
 				payload.callee = data.getCallee();
-				payload.status = data.getStatus();
+				payload.status = data.getUserAgent();
 
 				logger.debug("******userName==>"+ mem.getUsername());
 				this.msgTemplate.convertAndSendToUser(mem.getUsername(), "/queue/groupware", payload);
