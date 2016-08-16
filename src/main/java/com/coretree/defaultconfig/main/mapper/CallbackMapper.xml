@@ -145,13 +145,15 @@
 
     <insert id="insTCallback" parameterType="com.coretree.defaultconfig.main.model.Callback">
     	insert into tcallback (
-    		res_tel_no
+    		cb_seq
+    		, res_tel_no
     		, res_date
     		, res_hms
     		, gen_dir_no
     		, coun_cd
     	) values (
-    		#{resTelNo}
+    		GEN_ID(SEQ_CALLBACK, 1)
+    		, #{resTelNo}
     		, #{resDate}
     		, #{resHms}
     		, #{genDirNo}
