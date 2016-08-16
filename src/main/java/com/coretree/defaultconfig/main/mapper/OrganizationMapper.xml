@@ -2,17 +2,17 @@
 <mapper namespace="com.coretree.defaultconfig.main.mapper.OrganizationMapper">
 	
     <resultMap id="resultMap" type="com.coretree.defaultconfig.main.model.Organization">
-        <result property="password"		column="PASSWORD" />
+        <result property="password"			column="PASSWORD" />
         <result property="empNo"			column="EMP_NO" />
         <result property="empNm"			column="EMP_NM" />
         <result property="authCd"			column="AUTH_CD" />
-        <result property="extensionNo"			column="EXTENSION_NO" />
+        <result property="extensionNo"		column="EXTENSION_NO" />
         <result property="existCount"		column="EXIST_COUNT" />
     </resultMap>
 	
     <resultMap id="resultMap2" type="com.coretree.defaultconfig.main.model.Organization">
-        <result property="empNm"		column="USERNAME" />
-        <result property="extensionNo"			column="EXTENSION" />
+        <result property="empNm"			column="USERNAME" />
+        <result property="extensionNo"		column="EXTENSION" />
         <result property="state"			column="STATE" />
     </resultMap>
 	
@@ -26,6 +26,11 @@
        FROM TORGANIZATION
        WHERE EMP_NO = #{empNo}
        GROUP BY PASSWORD, EMP_NO,EMP_NM,AUTH_CD,EXTENSION_NO
+    </select>
+    
+    <select id="selectLoginUser" resultMap="resultMap">
+    	select emp_no, emp_nm, password, grp_cd, enter_date, auth_cd, mobile_phoneno, emailid, extension_no, note, '1001'
+    		from torganization order by emp_nm asc
     </select>
     
     <update  id="updatePwd" parameterType="com.coretree.defaultconfig.main.model.Organization">

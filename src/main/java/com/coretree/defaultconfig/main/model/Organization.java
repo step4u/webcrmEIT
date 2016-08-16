@@ -15,6 +15,8 @@ public class Organization {
 	private String agentStatCd;
 	private String newPwd;
 	private int existCount;
+	private int tempval;
+	private String tempstr;
 	
 	public String getEmpNo() { return EitStringUtil.isNullToString(empNo); }
 	public void setEmpNo(String empNo) { this.empNo = empNo; }
@@ -51,6 +53,12 @@ public class Organization {
 	
 	public int getExistCount() { return existCount; }
 	public void setExistCount(int existCount) { this.existCount = existCount; }
+	
+	public int getTempval() { return tempval; }
+	public void setTempval(int tempval) { this.tempval = tempval; }
+	
+	public String getTempstr() { return tempstr; }
+	public void setTempstr(String tempstr) { this.tempstr = tempstr; }
 	
 	@Override
 	public String toString() {

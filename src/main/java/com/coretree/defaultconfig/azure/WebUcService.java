@@ -3,7 +3,6 @@ package com.coretree.defaultconfig.azure;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -18,7 +17,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.neo4j.cypher.internal.compiler.v2_2.perty.gen.toStringDocGen;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.core.MessageSendingOperations;
@@ -37,8 +35,6 @@ import com.coretree.defaultconfig.mapper.Call;
 import com.coretree.defaultconfig.mapper.CallMapper;
 import com.coretree.defaultconfig.mapper.Customer2;
 import com.coretree.defaultconfig.mapper.Customer2Mapper;
-import com.coretree.defaultconfig.mapper.Member;
-import com.coretree.defaultconfig.mapper.MemberMapper;
 import com.coretree.defaultconfig.main.mapper.OrganizationMapper;
 import com.coretree.defaultconfig.mapper.SmsMapper_sample;
 import com.coretree.defaultconfig.mapper.Sms_sample;
@@ -118,27 +114,27 @@ public class WebUcService implements
 		switch (message.cmd) {
 			case Const4pbx.WS_REQ_EXTENSION_STATE:
 				message.cmd = Const4pbx.WS_RES_EXTENSION_STATE;
-				for (Organization m : orgnizations) {
+				for (Organization m : organizations) {
 					message.extension = m.getExtensionNo();
 					message.status = m.getAgentStatCd();
 					this.msgTemplate.convertAndSendToUser(principal.getName(), "/queue/groupware", message);
 				}
 				break;
 			case Const4pbx.WS_REQ_SET_EXTENSION_STATE:
-				Organization orgnization = orgnizations.stream().filter(x -> x.getExtensionNo().equals(message.extension)).findFirst().get();
+				Organization orgnization = organizations.stream().filter(x -> x.getExtensionNo().equals(message.extension)).findFirst().get();
 
 				logger.debug(orgnization);
 				break;
 			case Const4pbx.WS_REQ_RELOAD_USER:
 				break;
-			case Const4pbx.WS_VALUE_EXTENSION_STATE_ONLINE:
+			case Const4pbx.WS_VALUE_EXTENSION_STATE_READY:
+			case Const4pbx.WS_VALUE_EXTENSION_STATE_AFTER:
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_LEFT:
-			case Const4pbx.WS_VALUE_EXTENSION_STATE_DND:
-			case Const4pbx.WS_VALUE_EXTENSION_STATE_REDIRECTED:
+			case Const4pbx.WS_VALUE_EXTENSION_STATE_EDU:
 				Organization organization;
 				r.lock();
 				try {
-					organization = orgnizations.stream().filter(x -> x.getExtensionNo().equals(message.extension)).findFirst().get();
+					organization = organizations.stream().filter(x -> x.getExtensionNo().equals(message.extension)).findFirst().get();
 				} catch (NoSuchElementException | NullPointerException e) {
 					organization = null;
 				} finally {
@@ -176,8 +172,8 @@ public class WebUcService implements
 ////////////////////////////    
 	
 	
-	private void initializeUserState() {
-		organizations = orgnizationMapper.selectLoginUser();
+	private void InitializeUserState() {
+		organizations = organizationMapper.selectLoginUser();
 		sendExtensionStatus();
 	}
 	
@@ -225,7 +221,7 @@ public class WebUcService implements
         uc.HaveGotUcMessageEventHandler.addEventHandler(this);
         // uc.regist();
 
-        initializeUserState();
+        InitializeUserState();
     }
 
     @Override
@@ -251,7 +247,7 @@ public class WebUcService implements
 			case Const4pbx.UC_REPORT_EXT_STATE:
 				for (Organization orgnization : organizations) {
 					if (orgnization.getExtensionNo().equals(data.getExtension())) {
-						orgnization.setAgentStatCd(data.getStatus().toString());
+						orgnization.setAgentStatCd(String.valueOf(data.getStatus()));
 					}
 				}
 				if (data.getCallee().isEmpty()) break;
@@ -292,7 +288,8 @@ public class WebUcService implements
 				if (data.getExtension() == null) return;
 				if (data.getExtension().isEmpty()) return;
 
-				Organization organization = organizationMapper.selectByExt(data.getExtension());
+				// Organization organization = organizationMapper.selectByExt(data.getExtension());
+				Organization organization = organizations.stream().filter(x -> x.getExtensionNo().equals(data.getExtension())).findFirst().get();
 
 				if (organization.getEmpNo() == null) return;
 				if (organization.getEmpNm().isEmpty()) return;
@@ -304,8 +301,8 @@ public class WebUcService implements
 				payload.callee = data.getCallee();
 				payload.status = data.getUserAgent();
 
-				logger.debug("******userName==>"+ mem.getUsername());
-				this.msgTemplate.convertAndSendToUser(mem.getUsername(), "/queue/groupware", payload);
+				logger.debug("******userName==>"+ organization.getEmpNo());
+				this.msgTemplate.convertAndSendToUser(organization.getEmpNo(), "/queue/groupware", payload);
 				break;
 		}
 	}
@@ -318,22 +315,22 @@ public class WebUcService implements
 		payload.caller = data.getCaller();
 		payload.callee = data.getCallee();
 		payload.unconditional = data.getUnconditional();
-		payload.status = data.getStatus();
+		payload.status = String.valueOf(data.getStatus());
 		payload.responseCode = data.getResponseCode();
 
-		Member counsellor = null;
+		Organization organization = null;
 
 		r.lock();
 		try
 		{
-			counsellor = userstate.stream().filter(x -> x.getExtension().equals(data.getExtension())).findFirst().get();
+			organization = organizations.stream().filter(x -> x.getExtensionNo().equals(data.getExtension())).findFirst().get();
 		} catch (NoSuchElementException | NullPointerException e) {
 			return;
 		} finally {
 			r.unlock();
 		}
 		
-		logger.info("******PassReportExtState:"+ data.getCmd());
+		logger.info("******PassReportExtState:" + data.getCmd());
 
 		switch (data.getCmd()) {
 			case Const4pbx.UC_REPORT_WAITING_COUNT:
@@ -341,30 +338,31 @@ public class WebUcService implements
 				break;
 			case Const4pbx.UC_CLEAR_SRV_RES:
 				if (data.getStatus() == Const4pbx.UC_STATUS_SUCCESS) {
-					counsellor.setState(Const4pbx.WS_VALUE_EXTENSION_STATE_ONLINE);
-					counsellor.setTempstr("");
-					payload.status = counsellor.getState();
+					organization.setAgentStatCd(String.valueOf(Const4pbx.WS_VALUE_EXTENSION_STATE_READY));
+					organization.setTempstr("");
+					payload.status = organization.getAgentStatCd();
 					this.messagingTemplate.convertAndSend("/topic/ext.state." + data.getExtension(), payload);
 				}
 				break;
 			case Const4pbx.UC_SET_SRV_RES:
 				if (data.getStatus() == Const4pbx.UC_STATUS_SUCCESS) {
-					counsellor.setState(counsellor.getTempval());
+					organization.setAgentStatCd(String.valueOf(organization.getTempval()));
 					if (data.getResponseCode() == Const4pbx.UC_SRV_UNCONDITIONAL) {
-						counsellor.setTempstr(data.getUnconditional());
+						organization.setTempstr(data.getUnconditional());
 					} else if (data.getResponseCode() == Const4pbx.UC_SRV_NOANSWER) {
-						counsellor.setTempstr(data.getNoanswer());
+						organization.setTempstr(data.getNoanswer());
 					} else if (data.getResponseCode() == Const4pbx.UC_SRV_BUSY) {
-						counsellor.setTempstr(data.getBusy());
+						organization.setTempstr(data.getBusy());
 					}
 				}
 				break;
 			case Const4pbx.UC_REPORT_SRV_STATE:
-				if (counsellor.getState() == Const4pbx.WS_VALUE_EXTENSION_STATE_ONLINE
-						|| counsellor.getState() == Const4pbx.WS_VALUE_EXTENSION_STATE_LEFT
-						|| counsellor.getState() == Const4pbx.WS_VALUE_EXTENSION_STATE_DND
-						|| counsellor.getState() == Const4pbx.WS_VALUE_EXTENSION_STATE_REDIRECTED) {
-					payload.status = counsellor.getState();
+				if (organization.getAgentStatCd().equals(Const4pbx.WS_VALUE_EXTENSION_STATE_READY)
+						|| organization.getAgentStatCd().equals(String.valueOf(Const4pbx.WS_VALUE_EXTENSION_STATE_AFTER))
+						|| organization.getAgentStatCd().equals(String.valueOf(Const4pbx.WS_VALUE_EXTENSION_STATE_LEFT)) 
+						|| organization.getAgentStatCd().equals(String.valueOf(Const4pbx.WS_VALUE_EXTENSION_STATE_REST))
+						|| organization.getAgentStatCd().equals(String.valueOf(Const4pbx.WS_VALUE_EXTENSION_STATE_EDU))) {
+					payload.status = organization.getAgentStatCd();
 
 					this.messagingTemplate.convertAndSend("/topic/ext.state." + data.getExtension(), payload);
 				}
@@ -416,14 +414,14 @@ public class WebUcService implements
 							case Const4pbx.UC_CALL_STATE_INVITING:
 							case Const4pbx.UC_CALL_STATE_RINGING:
 								if (call == null) {
-									Member member = memberMapper.selectByExt(data.getExtension());
+									// Member member = memberMapper.selectByExt(data.getExtension());
 
 									call = new Call();
 									call.setExtension(data.getExtension());
 									call.setCust_tel(data.getCaller());
 									call.setStatus(data.getStatus());
 									call.setDirect(data.getDirect());
-									call.setUsername(member.getUsername());
+									call.setUsername(organization.getEmpNo());
 
 									w.lock();
 									try {
@@ -451,23 +449,22 @@ public class WebUcService implements
 						if (call != null) {
 							call.setStatus(data.getStatus());
 
-							Member member = memberMapper.selectByExt(data.getExtension());
-							if (member != null) {
+							// Member member = memberMapper.selectByExt(data.getExtension());
+							if (organization != null) {
 								Customer2 cust = custMapper.findByExt(data.getCaller());
 
 								if (cust != null) {
 									payload.callername = cust.getCust_nm();
 									payload.cust_no = cust.getCust_cd();
 								}
-								if (member != null) {
-									payload.calleename = member.getUname();
+								if (organization != null) {
+									payload.calleename = organization.getEmpNo();
 								}
 
 								payload.call_idx = call.getIdx();
-								this.msgTemplate.convertAndSendToUser(member.getUsername(), "/queue/groupware", payload);
+								this.msgTemplate.convertAndSendToUser(organization.getEmpNo(), "/queue/groupware", payload);
 							}
 						}
-						// this.messagingTemplate.convertAndSend("/topic/ext.state." + data.getExtension(), payload);
 						break;
 					case Const4pbx.UC_DIRECT_OUTGOING:
 						r.lock();
@@ -510,7 +507,7 @@ public class WebUcService implements
 								break;
 							case Const4pbx.UC_CALL_STATE_INVITING:
 								if (call == null) {
-									Member member = memberMapper.selectByExt(data.getExtension());
+									// Member member = memberMapper.selectByExt(data.getExtension());
 
 									call = new Call();
 									call.setExtension(data.getExtension());
@@ -518,7 +515,7 @@ public class WebUcService implements
 									call.setStartdate(new Timestamp(System.currentTimeMillis()));
 									call.setStatus(data.getStatus());
 									call.setDirect(data.getDirect());
-									call.setUsername(member.getUsername());
+									call.setUsername(organization.getEmpNo());
 
 									w.lock();
 									try {
@@ -545,24 +542,23 @@ public class WebUcService implements
 						if (call != null) {
 							call.setStatus(data.getStatus());
 
-							Member member = memberMapper.selectByExt(data.getExtension());
-							if (member != null) {
+							// Member member = memberMapper.selectByExt(data.getExtension());
+							
+							if (organization != null) {
 								Customer2 cust = custMapper.findByExt(data.getCallee());
 
 								if (cust != null) {
 									payload.calleename = cust.getCust_nm();
 									payload.cust_no = cust.getCust_no();
 								}
-								if (member != null) {
-									payload.callername = member.getUname();
+								if (organization != null) {
+									payload.callername = organization.getEmpNo();
 								}
 
 								payload.call_idx = call.getIdx();
-								this.msgTemplate.convertAndSendToUser(member.getUsername(), "/queue/groupware", payload);
+								this.msgTemplate.convertAndSendToUser(organization.getEmpNo(), "/queue/groupware", payload);
 							}
 						}
-
-						// this.messagingTemplate.convertAndSend("/topic/ext.state." + data.getExtension(), payload);
 						break;
 					default:
 						this.messagingTemplate.convertAndSend("/topic/ext.state." + data.getExtension(), payload);
@@ -586,8 +582,6 @@ public class WebUcService implements
 		} finally {
 			r.unlock();
 		}
-
-		// this.msgTemplate.convertAndSendToUser(mem.getUsername(), "/queue/groupware", data);
 	}
 
 	private void PassReportSms2(byte[] bytes) {
@@ -600,15 +594,15 @@ public class WebUcService implements
 		}
 		this.SendSms(data);
 
-		Member mem = userstate.stream().filter(x -> x.getExtension().equals(data.getFrom_ext())).findFirst().get();
+		Organization organization = organizations.stream().filter(x -> x.getExtensionNo().equals(data.getFrom_ext())).findFirst().get();
 
-		if (mem.getUsername() == null) return;
-		if (mem.getUsername().isEmpty()) return;
+		if (organization.getEmpNo() == null) return;
+		if (organization.getEmpNo().isEmpty()) return;
 
 		UcMessage payload = new UcMessage();
 		payload.cmd = data.getCmd();
 		payload.extension = data.getFrom_ext();
-		payload.status = data.getStatus();
+		payload.status = String.valueOf(data.getStatus());
 
 		Sms_sample runningsms = null;
 
@@ -616,10 +610,10 @@ public class WebUcService implements
 		try {
 			runningsms = smsrunning.stream().filter(x -> x.getExt().equals(data.getFrom_ext())).findFirst().get();
 			runningsms.setResult(data.getStatus());
-			payload.status = data.getStatus();
+			payload.status = String.valueOf(data.getStatus());
 			smsMapper.setresult(runningsms);
 		} catch (NoSuchElementException | NullPointerException e) {
-			payload.status = Const4pbx.WS_STATUS_ING_NOTFOUND;
+			payload.status.equals(String.valueOf(Const4pbx.WS_STATUS_ING_NOTFOUND));
 		} catch (Exception e) {
 
 		} finally {
@@ -630,12 +624,12 @@ public class WebUcService implements
 		try {
 			smsrunning.removeIf(x -> x.equals(data.getFrom_ext()));
 		} catch (UnsupportedOperationException | NullPointerException e) {
-			payload.status = Const4pbx.WS_STATUS_ING_UNSUPPORTED;
+			payload.status.equals(String.valueOf(Const4pbx.WS_STATUS_ING_UNSUPPORTED));
 		} finally {
 			w.unlock();
 		}
 
-		this.msgTemplate.convertAndSendToUser(mem.getUsername(), "/queue/groupware", payload);
+		this.msgTemplate.convertAndSendToUser(organization.getEmpNo(), "/queue/groupware", payload);
 	}
 
 	class Timer_Elapsed extends TimerTask {
