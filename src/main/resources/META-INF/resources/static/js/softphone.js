@@ -61,6 +61,11 @@ function stompConnect() {
 			stompClient.subscribe('/user/queue/groupware', function(receviedMessage){
 				coreTreeQueueHandler(JSON.parse(receviedMessage.body));
 			});
+			
+			stompClient.subscribe('/user/queue/UsersState', function(receviedMessage){
+				// coreTreeQueueHandler(JSON.parse(receviedMessage.body));
+				console.log(receviedMessage.body);
+			});
 
 			stompClient.subscribe('/user/queue/errors', function(receviedError){
 				webStompErrorHandler(receviedError);

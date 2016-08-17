@@ -10,10 +10,10 @@
         <result property="existCount"		column="EXIST_COUNT" />
     </resultMap>
 	
-    <resultMap id="resultMap2" type="com.coretree.defaultconfig.main.model.Organization">
-        <result property="empNm"			column="USERNAME" />
-        <result property="extensionNo"		column="EXTENSION" />
-        <result property="state"			column="STATE" />
+     <resultMap id="resultMap2" type="com.coretree.defaultconfig.main.model.Organization">
+        <result property="empNm"				column="EMP_NM" />
+        <result property="extensionNo"			column="EXTENSION_NO" />
+        <result property="agent_state_cd"		column="AGENT_STAT_CD" />
     </resultMap>
 	
     <select id="checkLogin" parameterType="com.coretree.defaultconfig.main.model.Organization"  resultMap="resultMap">
@@ -45,13 +45,8 @@
        FROM TORGANIZATION
     </select>	
     
-    <select id="usersState" resultMap="resultMap2" >
-    	SELECT a.USERNAME		
-			        ,EXTENSION	
-					,STATE
-		FROM USERS a, USERS_EXTS b
-		WHERE a.USERNAME = b.USERNAME
-        ORDER BY USERNAME
+    <select id="usersState" resultMap="resultMap" >
+    	SELECT EMP_NO, EXTENSION_NO, AGENT_STAT_CD FROM TORGANIZATION
         <!-- SELECT a.USERNAME		
 			        ,EXTENSION	
 					,STATE

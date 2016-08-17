@@ -31,7 +31,7 @@ public class Organization {
 	public void setGrpCd(String grpCd) { this.grpCd = grpCd; }
 	
 	public String getEnterDate() { return EitStringUtil.isNullToString(enterDate); }
-	public void setEnterDate(String enterDate) { this.grpCd = enterDate; }
+	public void setEnterDate(String enterDate) { this.enterDate = enterDate; }
 	
 	public String getAuthCd() { return EitStringUtil.isNullToString(authCd); }
 	public void setAuthCd(String authCd) { this.authCd = authCd; }

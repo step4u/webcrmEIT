@@ -26,10 +26,13 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coretree.defaultconfig.main.mapper.CallbackMapper;
 import com.coretree.defaultconfig.main.model.Callback;
+import com.coretree.defaultconfig.main.model.OrgStatatistics;
 import com.coretree.defaultconfig.main.model.Organization;
 import com.coretree.defaultconfig.mapper.Call;
 import com.coretree.defaultconfig.mapper.CallMapper;
@@ -100,6 +103,23 @@ public class WebUcService implements
     }
 
 ////////////////////////////
+    
+    @MessageMapping("/UsersState")
+	public void usersState(Principal principal) throws Exception {
+    	OrgStatatistics orgstates = new OrgStatatistics();
+    	
+    	orgstates.setTotal(organizations.size());
+    	orgstates.setReady((int)organizations.stream().filter(x -> x.getAgentStatCd().equals("1001")).count());
+    	orgstates.setAfter((int)organizations.stream().filter(x -> x.getAgentStatCd().equals("1002")).count());
+    	orgstates.setBusy((int)organizations.stream().filter(x -> x.getAgentStatCd().equals("1006")).count());
+    	orgstates.setLeft((int)organizations.stream().filter(x -> x.getAgentStatCd().equals("1003")).count());
+    	orgstates.setRest((int)organizations.stream().filter(x -> x.getAgentStatCd().equals("1004")).count());
+    	orgstates.setEdu((int)organizations.stream().filter(x -> x.getAgentStatCd().equals("1005")).count());
+    	orgstates.setLogined(orgstates.getReady() + orgstates.getAfter() + orgstates.getBusy() + orgstates.getLeft() + orgstates.getEdu());
+    	orgstates.setLogouted(orgstates.getTotal() - orgstates.getLogined());
+		
+    	this.msgTemplate.convertAndSendToUser(principal.getName(), "/topic/orgstates", orgstates);
+	}
 	
 	@MessageMapping("/call" )
 	public void queueCallMessage(UcMessage message, Principal principal) {
@@ -107,9 +127,6 @@ public class WebUcService implements
 		//logger.debug("::::::queueCallMessage------>" + principal);
 		System.out.println("::::::queueCallMessage------>" + message.toString());
 		logger.debug(message.cmd+ ":=================>>>" + message);
-//		for (Member m : userstate) {
-//			logger.debug("Member:---" + m);
-//		}
 		
 		switch (message.cmd) {
 			case Const4pbx.WS_REQ_EXTENSION_STATE:
