@@ -66,7 +66,8 @@ public class WebUcService implements
     private UcServer uc;
 
 	private AtomicBoolean brokerAvailable = new AtomicBoolean();
-	private ByteOrder byteorder = ByteOrder.BIG_ENDIAN;
+	// private ByteOrder byteorder = ByteOrder.BIG_ENDIAN;
+	private ByteOrder byteorder = ByteOrder.LITTLE_ENDIAN;
 
     @Autowired
     private WebUcServiceConfig configs;
@@ -147,6 +148,7 @@ public class WebUcService implements
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_READY:
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_AFTER:
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_LEFT:
+			case Const4pbx.WS_VALUE_EXTENSION_STATE_REST:
 			case Const4pbx.WS_VALUE_EXTENSION_STATE_EDU:
 				Organization organization;
 				r.lock();
@@ -161,7 +163,6 @@ public class WebUcService implements
 				this.RequestToPbx(message);
 				organization.setTempval(message.cmd);
 				break;
-				
 			default:
 				this.RequestToPbx(message);
 				break;
@@ -262,9 +263,9 @@ public class WebUcService implements
 				this.PassReportSms(e.getItem());
 				break;
 			case Const4pbx.UC_REPORT_EXT_STATE:
-				for (Organization orgnization : organizations) {
-					if (orgnization.getExtensionNo().equals(data.getExtension())) {
-						orgnization.setAgentStatCd(String.valueOf(data.getStatus()));
+				for (Organization organization : organizations) {
+					if (organization.getExtensionNo().equals(data.getExtension())) {
+						organization.setAgentStatCd(String.valueOf(data.getStatus()));
 					}
 				}
 				if (data.getCallee().isEmpty()) break;
@@ -431,8 +432,6 @@ public class WebUcService implements
 							case Const4pbx.UC_CALL_STATE_INVITING:
 							case Const4pbx.UC_CALL_STATE_RINGING:
 								if (call == null) {
-									// Member member = memberMapper.selectByExt(data.getExtension());
-
 									call = new Call();
 									call.setExtension(data.getExtension());
 									call.setCust_tel(data.getCaller());
