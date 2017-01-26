@@ -1,0 +1,424 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coretree.defaultconfig.statis.mapper.AgentStatMapper">
+
+    <resultMap id="resultMap" type="com.coretree.defaultconfig.statis.model.AgentStat">
+        <result property="regDate"		column="REG_DATE2" />
+        <result property="regHour"		column="REG_HOUR" />
+        <result property="empNo"		column="EMP_NO" />
+        <result property="empNm"		column="EMP_NM" />
+        
+        <result property="nInbound"		column="N_INBOUND" />
+        <result property="tInbound"	column="T_INBOUND" />
+		<result property="tInboundFmt"		column="T_INBOUND_FMT" />
+		<result property="nOutbound"		column="N_OUTBOUND" />
+		<result property="tOutbound"		column="T_OUTBOUND" />
+		<result property="tOutboundFmt"		column="T_OUTBOUND_FMT" />
+		<result property="nExtension"		column="N_EXTENSION" />
+		<result property="tExtension"		column="T_EXTENSION" />
+		<result property="tExtensionFmt"		column="T_EXTENSION_FMT" />
+		<result property="tAgentStat1011"		column="T_AGENT_STAT_1011" />
+		<result property="tAgentStat1011Fmt"		column="T_AGENT_STAT_1011_FMT" />
+		<result property="tAgentStat1012"		column="T_AGENT_STAT_1012" />
+		<result property="tAgentStat1012Fmt"		column="T_AGENT_STAT_1012_FMT" />
+		<result property="tAgentStat1013"		column="T_AGENT_STAT_1013" />
+		<result property="tAgentStat1013Fmt"		column="T_AGENT_STAT_1013_FMT" />
+		<result property="tAgentStat1014"		column="T_AGENT_STAT_1014" />
+		<result property="tAgentStat1014Fmt"		column="T_AGENT_STAT_1014_FMT" />
+		<result property="tAgentStat1015"		column="T_AGENT_STAT_1015" />
+		<result property="tAgentStat1015Fmt"		column="T_AGENT_STAT_1015_FMT" />
+		<result property="nCallback"		column="N_CALLBACK" />
+		<result property="nReservation"		column="N_RESERVATION" />
+		<result property="nSms"		column="N_SMS" />
+		
+		<result property="leadStartDate"		column="leadStartDate" />
+		<result property="leadEndDate"		column="leadEndDate" />
+    </resultMap>
+    
+    <resultMap id="resultMap2" type="com.coretree.defaultconfig.setting.model.Torganization">
+        <result property="empNo"		column="emp_no" />
+        <result property="empNm"		column="emp_nm" />
+        <result property="grpCd"		column="grp_cd" />
+        <result property="enterDate"		column="enter_date" />
+        <result property="authCd"		column="auth_cd" />
+		<result property="mobilePhoneNo"		column="mobile_phoneno" />
+		<result property="emailId"		column="emailid" />
+		<result property="extensionNo"		column="extension_no" />
+		<result property="password"		column="password" />
+		<result property="note"		column="note" />
+    </resultMap>
+	
+	<!-- <resultMap id="resultMap3" type="com.coretree.defaultconfig.statis.model.AgentStat">
+	  	<result property="sum_nInbound"		column="SUM_N_INBOUND" />
+		<result property="sum_tInbound"	column="SUM_T_INBOUND" />
+		<result property="sum_tInboundFmt"		column="SUM_T_INBOUND_FMT" />
+		<result property="sum_nOutbound"		column="SUM_N_OUTBOUND" />
+		<result property="sum_tOutbound"		column="SUM_T_OUTBOUND" />
+		<result property="sum_tOutboundFmt"		column="SUM_T_OUTBOUND_FMT" />
+		<result property="sum_nExtension"		column="SUM_N_EXTENSION" />
+		<result property="sum_tExtension"		column="SUM_T_EXTENSION" />
+		<result property="sum_tExtensionFmt"		column="SUM_T_EXTENSION_FMT" />
+		<result property="sum_tAgentStat1011"		column="SUM_T_AGENT_STAT_1011" />
+		<result property="sum_tAgentStat1011Fmt"		column="SUM_T_AGENT_STAT_1011_FMT" />
+		<result property="sum_tAgentStat1012"		column="SUM_T_AGENT_STAT_1012" />
+		<result property="sum_tAgentStat1012Fmt"		column="SUM_T_AGENT_STAT_1012_FMT" />
+		<result property="sum_tAgentStat1013"		column="SUM_T_AGENT_STAT_1013" />
+		<result property="sum_tAgentStat1013Fmt"		column="SUM_T_AGENT_STAT_1013_FMT" />
+		<result property="sum_tAgentStat1014"		column="SUM_T_AGENT_STAT_1014" />
+		<result property="sum_tAgentStat1014Fmt"		column="SUM_T_AGENT_STAT_1014_FMT" />
+		<result property="sum_tAgentStat1015"		column="SUM_T_AGENT_STAT_1015" />
+		<result property="sum_tAgentStat1015Fmt"		column="SUM_T_AGENT_STAT_1015_FMT" />
+		<result property="sum_nCallback"		column="SUM_N_CALLBACK" />
+		<result property="sum_nReservation"		column="SUM_N_RESERVATION" />
+		<result property="sum_nSms"		column="SUM_N_SMS" />
+		
+		<result property="avg_nInbound"		column="AVG_N_INBOUND" />
+		<result property="avg_tInbound"	column="AVG_T_INBOUND" />
+		<result property="avg_tInboundFmt"		column="AVG_T_INBOUND_FMT" />
+		<result property="avg_nOutbound"		column="AVG_N_OUTBOUND" />
+		<result property="avg_tOutbound"		column="AVG_T_OUTBOUND" />
+		<result property="avg_tOutboundFmt"		column="AVG_T_OUTBOUND_FMT" />
+		<result property="avg_nExtension"		column="AVG_N_EXTENSION" />
+		<result property="avg_tExtension"		column="AVG_T_EXTENSION" />
+		<result property="avg_tExtensionFmt"		column="AVG_T_EXTENSION_FMT" />
+		<result property="avg_tAgentStat1011"		column="AVG_T_AGENT_STAT_1011" />
+		<result property="avg_tAgentStat1011Fmt"		column="AVG_T_AGENT_STAT_1011_FMT" />
+		<result property="avg_tAgentStat1012"		column="AVG_T_AGENT_STAT_1012" />
+		<result property="avg_tAgentStat1012Fmt"		column="AVG_T_AGENT_STAT_1012_FMT" />
+		<result property="avg_tAgentStat1013"		column="AVG_T_AGENT_STAT_1013" />
+		<result property="avg_tAgentStat1013Fmt"		column="AVG_T_AGENT_STAT_1013_FMT" />
+		<result property="avg_tAgentStat1014"		column="AVG_T_AGENT_STAT_1014" />
+		<result property="avg_tAgentStat1014Fmt"		column="AVG_T_AGENT_STAT_1014_FMT" />
+		<result property="avg_tAgentStat1015"		column="AVG_T_AGENT_STAT_1015" />
+		<result property="avg_tAgentStat1015Fmt"		column="AVG_T_AGENT_STAT_1015_FMT" />
+		<result property="avg_nCallback"		column="AVG_N_CALLBACK" />
+		<result property="avg_nReservation"		column="AVG_N_RESERVATION" />
+		<result property="avg_nSms"		column="AVG_N_SMS" />
+	</resultMap> -->
+	
+    <select id="selectAgentStatList" parameterType="com.coretree.defaultconfig.statis.model.AgentStat" resultMap="resultMap">
+	SELECT 
+		case when ( SELECT * FROM GET_FORMAT_DATE(REG_DATE) p ) is null then '' else ( SELECT * FROM GET_FORMAT_DATE(REG_DATE) p ) end as REG_DATE2
+		, REG_HOUR
+		, EMP_NO								
+		, EMP_NM								
+		, SUM(N_INBOUND)						AS N_INBOUND        				
+		, SUM(T_INBOUND)						AS T_INBOUND        				
+        , ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_INBOUND) 		is null then 0  else  SUM(T_INBOUND)  	end ) ) p ) 	as T_INBOUND_FMT   
+		, SUM(N_OUTBOUND)					AS N_OUTBOUND       				
+		, SUM(T_OUTBOUND)					AS T_OUTBOUND       				
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_OUTBOUND) 		is null then 0  else  SUM(T_OUTBOUND)  	end ) ) p ) 	as T_OUTBOUND_FMT   	
+		, SUM(N_EXTENSION)					AS N_EXTENSION      				
+		, SUM(T_EXTENSION)					AS T_EXTENSION      			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_EXTENSION) 		is null then 0  else  SUM(T_EXTENSION)  	end ) ) p ) 	as T_EXTENSION_FMT   	
+		, SUM(T_AGENT_STAT_1011)		AS T_AGENT_STAT_1011			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1011) 		is null then 0  else  SUM(T_AGENT_STAT_1011)  	end ) ) p ) 	as T_AGENT_STAT_1011_FMT 
+		, SUM(T_AGENT_STAT_1012)		AS T_AGENT_STAT_1012			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1012) 		is null then 0  else  SUM(T_AGENT_STAT_1012)  	end ) ) p ) 	as T_AGENT_STAT_1012_FMT 
+		, SUM(T_AGENT_STAT_1013)		AS T_AGENT_STAT_1013 			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1013) 		is null then 0  else  SUM(T_AGENT_STAT_1013)  	end ) ) p ) 	as T_AGENT_STAT_1013_FMT 
+		, SUM(T_AGENT_STAT_1014)		AS T_AGENT_STAT_1014			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1014) 		is null then 0  else  SUM(T_AGENT_STAT_1014)  	end ) ) p ) 	as T_AGENT_STAT_1014_FMT 
+		, SUM(T_AGENT_STAT_1015)		AS T_AGENT_STAT_1015			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1015) 		is null then 0  else  SUM(T_AGENT_STAT_1015)  	end ) ) p ) 	as T_AGENT_STAT_1015_FMT 
+		, SUM(N_CALLBACK)						AS N_CALLBACK       			
+		, SUM(N_RESERVATION)				AS N_RESERVATION    			
+		, SUM(N_SMS)								AS N_SMS             	
+	FROM TAGENT_STATS_PERFORM 
+	WHERE 
+    	1=1 
+    		AND EMP_NM <![CDATA[<>]]> 'SuperAdmin'
+    	<if test="leadStartDate != ''">
+			AND REG_DATE <![CDATA[>=]]> #{leadStartDate}
+		 </if>
+	  	<if test="leadEndDate != ''">
+			AND REG_DATE <![CDATA[<=]]> #{leadEndDate}
+		 </if>
+		<if test="empNm != ''">
+			AND EMP_NM = #{empNm}
+		 </if>
+	GROUP BY REG_DATE, REG_HOUR, EMP_NO, EMP_NM
+    </select>
+    
+    <select id="selectAgentStatListDay" parameterType="com.coretree.defaultconfig.statis.model.AgentStat" resultMap="resultMap">
+	SELECT 
+		case when ( SELECT * FROM GET_FORMAT_DATE(REG_DATE) p ) is null then '' else ( SELECT * FROM GET_FORMAT_DATE(REG_DATE) p ) end as REG_DATE2
+		, EMP_NO								
+		, EMP_NM								
+		, SUM(N_INBOUND)						AS N_INBOUND        				
+		, SUM(T_INBOUND)						AS T_INBOUND        				
+        , ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_INBOUND) 		is null then 0  else  SUM(T_INBOUND)  	end ) ) p ) 	as T_INBOUND_FMT   
+		, SUM(N_OUTBOUND)					AS N_OUTBOUND       				
+		, SUM(T_OUTBOUND)					AS T_OUTBOUND       				
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_OUTBOUND) 		is null then 0  else  SUM(T_OUTBOUND)  	end ) ) p ) 	as T_OUTBOUND_FMT   	
+		, SUM(N_EXTENSION)					AS N_EXTENSION      				
+		, SUM(T_EXTENSION)					AS T_EXTENSION      			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_EXTENSION) 		is null then 0  else  SUM(T_EXTENSION)  	end ) ) p ) 	as T_EXTENSION_FMT   	
+		, SUM(T_AGENT_STAT_1011)		AS T_AGENT_STAT_1011			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1011) 		is null then 0  else  SUM(T_AGENT_STAT_1011)  	end ) ) p ) 	as T_AGENT_STAT_1011_FMT 
+		, SUM(T_AGENT_STAT_1012)		AS T_AGENT_STAT_1012			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1012) 		is null then 0  else  SUM(T_AGENT_STAT_1012)  	end ) ) p ) 	as T_AGENT_STAT_1012_FMT 
+		, SUM(T_AGENT_STAT_1013)		AS T_AGENT_STAT_1013 			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1013) 		is null then 0  else  SUM(T_AGENT_STAT_1013)  	end ) ) p ) 	as T_AGENT_STAT_1013_FMT 
+		, SUM(T_AGENT_STAT_1014)		AS T_AGENT_STAT_1014			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1014) 		is null then 0  else  SUM(T_AGENT_STAT_1014)  	end ) ) p ) 	as T_AGENT_STAT_1014_FMT 
+		, SUM(T_AGENT_STAT_1015)		AS T_AGENT_STAT_1015			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1015) 		is null then 0  else  SUM(T_AGENT_STAT_1015)  	end ) ) p ) 	as T_AGENT_STAT_1015_FMT 
+		, SUM(N_CALLBACK)						AS N_CALLBACK       			
+		, SUM(N_RESERVATION)				AS N_RESERVATION    			
+		, SUM(N_SMS)								AS N_SMS             	
+	FROM TAGENT_STATS_PERFORM 
+	WHERE 
+    	1=1
+    		AND EMP_NM <![CDATA[<>]]> 'SuperAdmin'
+    	<if test="leadStartDate != ''">
+			AND REG_DATE <![CDATA[>=]]> #{leadStartDate}
+		 </if>
+	  	<if test="leadEndDate != ''">
+			AND REG_DATE <![CDATA[<=]]> #{leadEndDate}
+		 </if>
+		<if test="empNm != ''">
+			AND EMP_NM = #{empNm}
+		 </if>
+	GROUP BY REG_DATE, EMP_NO, EMP_NM
+    </select>
+    
+    <select id="selectAgentStatListMonth" parameterType="com.coretree.defaultconfig.statis.model.AgentStat" resultMap="resultMap">
+	SELECT 
+		  case when ( SELECT * FROM GET_FORMAT_DATE(substring(REG_DATE from 1 for 6)) p ) is null then '' else ( SELECT * FROM GET_FORMAT_DATE(substring(REG_DATE from 1 for 6)) p ) end as REG_DATE2					
+		, EMP_NO								
+		, EMP_NM								
+		, SUM(N_INBOUND)						AS N_INBOUND        				
+		, SUM(T_INBOUND)						AS T_INBOUND        				
+        , ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_INBOUND) 		is null then 0  else  SUM(T_INBOUND)  	end ) ) p ) 	as T_INBOUND_FMT   
+		, SUM(N_OUTBOUND)					AS N_OUTBOUND       				
+		, SUM(T_OUTBOUND)					AS T_OUTBOUND       				
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_OUTBOUND) 		is null then 0  else  SUM(T_OUTBOUND)  	end ) ) p ) 	as T_OUTBOUND_FMT   	
+		, SUM(N_EXTENSION)					AS N_EXTENSION      				
+		, SUM(T_EXTENSION)					AS T_EXTENSION      			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_EXTENSION) 		is null then 0  else  SUM(T_EXTENSION)  	end ) ) p ) 	as T_EXTENSION_FMT   	
+		, SUM(T_AGENT_STAT_1011)		AS T_AGENT_STAT_1011			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1011) 		is null then 0  else  SUM(T_AGENT_STAT_1011)  	end ) ) p ) 	as T_AGENT_STAT_1011_FMT 
+		, SUM(T_AGENT_STAT_1012)		AS T_AGENT_STAT_1012			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1012) 		is null then 0  else  SUM(T_AGENT_STAT_1012)  	end ) ) p ) 	as T_AGENT_STAT_1012_FMT 
+		, SUM(T_AGENT_STAT_1013)		AS T_AGENT_STAT_1013 			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1013) 		is null then 0  else  SUM(T_AGENT_STAT_1013)  	end ) ) p ) 	as T_AGENT_STAT_1013_FMT 
+		, SUM(T_AGENT_STAT_1014)		AS T_AGENT_STAT_1014			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1014) 		is null then 0  else  SUM(T_AGENT_STAT_1014)  	end ) ) p ) 	as T_AGENT_STAT_1014_FMT 
+		, SUM(T_AGENT_STAT_1015)		AS T_AGENT_STAT_1015			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1015) 		is null then 0  else  SUM(T_AGENT_STAT_1015)  	end ) ) p ) 	as T_AGENT_STAT_1015_FMT 
+		, SUM(N_CALLBACK)						AS N_CALLBACK       			
+		, SUM(N_RESERVATION)				AS N_RESERVATION    			
+		, SUM(N_SMS)								AS N_SMS             	
+	FROM TAGENT_STATS_PERFORM 
+	WHERE 
+    	1=1
+    		AND EMP_NM <![CDATA[<>]]> 'SuperAdmin'
+    	<if test="leadStartDate != ''">
+			AND REG_DATE <![CDATA[>=]]> #{leadStartDate}
+		 </if>
+	  	<if test="leadEndDate != ''">
+			AND (REG_DATE <![CDATA[<=]]> #{leadEndDate} OR REG_DATE CONTAINING #{leadEndDate})
+		 </if>
+		<if test="empNm != ''">
+			AND EMP_NM = #{empNm}
+		 </if>
+	GROUP BY  substring(REG_DATE from 1 for 6), EMP_NO, EMP_NM
+    </select>
+    
+     <select id="selectAgentStatListYear" parameterType="com.coretree.defaultconfig.statis.model.AgentStat" resultMap="resultMap">
+	SELECT 
+		  case when ( SELECT * FROM GET_FORMAT_DATE(substring(REG_DATE from 1 for 4)) p ) is null then '' else ( SELECT * FROM GET_FORMAT_DATE(substring(REG_DATE from 1 for 4)) p ) end as REG_DATE2						
+		, EMP_NO								
+		, EMP_NM								
+		, SUM(N_INBOUND)						AS N_INBOUND        				
+		, SUM(T_INBOUND)						AS T_INBOUND        				
+        , ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_INBOUND) 		is null then 0  else  SUM(T_INBOUND)  	end ) ) p ) 	as T_INBOUND_FMT   
+		, SUM(N_OUTBOUND)					AS N_OUTBOUND       				
+		, SUM(T_OUTBOUND)					AS T_OUTBOUND       				
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_OUTBOUND) 		is null then 0  else  SUM(T_OUTBOUND)  	end ) ) p ) 	as T_OUTBOUND_FMT   	
+		, SUM(N_EXTENSION)					AS N_EXTENSION      				
+		, SUM(T_EXTENSION)					AS T_EXTENSION      			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_EXTENSION) 		is null then 0  else  SUM(T_EXTENSION)  	end ) ) p ) 	as T_EXTENSION_FMT   	
+		, SUM(T_AGENT_STAT_1011)		AS T_AGENT_STAT_1011			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1011) 		is null then 0  else  SUM(T_AGENT_STAT_1011)  	end ) ) p ) 	as T_AGENT_STAT_1011_FMT 
+		, SUM(T_AGENT_STAT_1012)		AS T_AGENT_STAT_1012			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1012) 		is null then 0  else  SUM(T_AGENT_STAT_1012)  	end ) ) p ) 	as T_AGENT_STAT_1012_FMT 
+		, SUM(T_AGENT_STAT_1013)		AS T_AGENT_STAT_1013 			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1013) 		is null then 0  else  SUM(T_AGENT_STAT_1013)  	end ) ) p ) 	as T_AGENT_STAT_1013_FMT 
+		, SUM(T_AGENT_STAT_1014)		AS T_AGENT_STAT_1014			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1014) 		is null then 0  else  SUM(T_AGENT_STAT_1014)  	end ) ) p ) 	as T_AGENT_STAT_1014_FMT 
+		, SUM(T_AGENT_STAT_1015)		AS T_AGENT_STAT_1015			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1015) 		is null then 0  else  SUM(T_AGENT_STAT_1015)  	end ) ) p ) 	as T_AGENT_STAT_1015_FMT 
+		, SUM(N_CALLBACK)						AS N_CALLBACK       			
+		, SUM(N_RESERVATION)				AS N_RESERVATION    			
+		, SUM(N_SMS)								AS N_SMS             	
+	FROM TAGENT_STATS_PERFORM 
+	WHERE 
+    	1=1
+    		AND EMP_NM <![CDATA[<>]]> 'SuperAdmin'
+    	<if test="leadStartDate != ''">
+			AND REG_DATE <![CDATA[>=]]> #{leadStartDate}
+		 </if>
+	  	<if test="leadEndDate != ''">
+			AND (REG_DATE <![CDATA[<=]]> #{leadEndDate} OR REG_DATE CONTAINING #{leadEndDate})
+		 </if>
+		<if test="empNm != ''">
+			AND EMP_NM = #{empNm}
+		 </if>
+	GROUP BY  substring(REG_DATE from 1 for 4), EMP_NO, EMP_NM
+    </select>
+    
+	<!-- <select id="selectAgentStatList2" parameterType="com.coretree.defaultconfig.statis.model.AgentStat" resultMap="resultMap3">
+	SELECT 
+		SUM(N_INBOUND) AS SUM_N_INBOUND
+		,SUM(T_INBOUND) AS SUM_T_INBOUND
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_INBOUND) 		is null then 0  else  SUM(T_INBOUND)  	end ) ) p ) 	as SUM_T_INBOUND_FMT   
+     	, SUM(N_OUTBOUND)					AS SUM_N_OUTBOUND       				
+		, SUM(T_OUTBOUND)					AS SUM_T_OUTBOUND       				
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_OUTBOUND) 		is null then 0  else  SUM(T_OUTBOUND)  	end ) ) p ) 	as SUM_T_OUTBOUND_FMT   	
+		, SUM(N_EXTENSION)					AS SUM_N_EXTENSION      				
+		, SUM(T_EXTENSION)					AS SUM_T_EXTENSION      			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_EXTENSION) 		is null then 0  else  SUM(T_EXTENSION)  	end ) ) p ) 	as SUM_T_EXTENSION_FMT   	
+		, SUM(T_AGENT_STAT_1011)		AS SUM_T_AGENT_STAT_1011			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1011) 		is null then 0  else  SUM(T_AGENT_STAT_1011)  	end ) ) p ) 	as SUM_T_AGENT_STAT_1011_FMT 
+		, SUM(T_AGENT_STAT_1012)		AS SUM_T_AGENT_STAT_1012			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1012) 		is null then 0  else  SUM(T_AGENT_STAT_1012)  	end ) ) p ) 	as SUM_T_AGENT_STAT_1012_FMT 
+		, SUM(T_AGENT_STAT_1013)		AS SUM_T_AGENT_STAT_1013 			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1013) 		is null then 0  else  SUM(T_AGENT_STAT_1013)  	end ) ) p ) 	as SUM_T_AGENT_STAT_1013_FMT 
+		, SUM(T_AGENT_STAT_1014)		AS SUM_T_AGENT_STAT_1014			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1014) 		is null then 0  else  SUM(T_AGENT_STAT_1014)  	end ) ) p ) 	as SUM_T_AGENT_STAT_1014_FMT 
+		, SUM(T_AGENT_STAT_1015)		AS SUM_T_AGENT_STAT_1015			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1015) 		is null then 0  else  SUM(T_AGENT_STAT_1015)  	end ) ) p ) 	as SUM_T_AGENT_STAT_1015_FMT 
+		, SUM(N_CALLBACK)						AS SUM_N_CALLBACK       			
+		, SUM(N_RESERVATION)				AS SUM_N_RESERVATION    			
+		, SUM(N_SMS)								AS SUM_N_SMS 
+		, SUM(N_INBOUND)/ count(REG_DATE) AS AVG_N_INBOUND
+     	, SUM(T_INBOUND)/ count(REG_DATE) AS AVG_T_INBOUND
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_INBOUND)/ count(REG_DATE) 		is null then 0  else  SUM(T_INBOUND)/ count(REG_DATE)  	end ) ) p ) 	as AVG_T_INBOUND_FMT   
+     	, SUM(N_OUTBOUND)/ count(REG_DATE)					AS AVG_N_OUTBOUND       				
+		, SUM(T_OUTBOUND)/ count(REG_DATE)					AS AVG_T_OUTBOUND       				
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_OUTBOUND)/ count(REG_DATE) 		is null then 0  else  SUM(T_OUTBOUND)/ count(REG_DATE)  	end ) ) p ) 	as AVG_T_OUTBOUND_FMT   	
+		, SUM(N_EXTENSION)/ count(REG_DATE)					AS AVG_N_EXTENSION      				
+		, SUM(T_EXTENSION)/ count(REG_DATE)					AS AVG_T_EXTENSION      			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_EXTENSION)/ count(REG_DATE) 		is null then 0  else  SUM(T_EXTENSION)/ count(REG_DATE)  	end ) ) p ) 	as AVG_T_EXTENSION_FMT   	
+		, SUM(T_AGENT_STAT_1011)/ count(REG_DATE)		AS AVG_T_AGENT_STAT_1011			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1011)/ count(REG_DATE) 		is null then 0  else  SUM(T_AGENT_STAT_1011)/ count(REG_DATE)  	end ) ) p ) 	as AVG_T_AGENT_STAT_1011_FMT 
+		, SUM(T_AGENT_STAT_1012)/ count(REG_DATE)		AS AVG_T_AGENT_STAT_1012			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1012) / count(REG_DATE)		is null then 0  else  SUM(T_AGENT_STAT_1012)/ count(REG_DATE)  	end ) ) p ) 	as AVG_T_AGENT_STAT_1012_FMT 
+		, SUM(T_AGENT_STAT_1013)/ count(REG_DATE)		AS AVG_T_AGENT_STAT_1013 			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1013) / count(REG_DATE)		is null then 0  else  SUM(T_AGENT_STAT_1013) / count(REG_DATE) 	end ) ) p ) 	as AVG_T_AGENT_STAT_1013_FMT 
+		, SUM(T_AGENT_STAT_1014)/ count(REG_DATE)		AS AVG_T_AGENT_STAT_1014			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1014) / count(REG_DATE)		is null then 0  else  SUM(T_AGENT_STAT_1014) / count(REG_DATE) 	end ) ) p ) 	as AVG_T_AGENT_STAT_1014_FMT 
+		, SUM(T_AGENT_STAT_1015)/ count(REG_DATE)		AS AVG_T_AGENT_STAT_1015			
+		, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+            ( case when  SUM(T_AGENT_STAT_1015)/ count(REG_DATE) 		is null then 0  else  SUM(T_AGENT_STAT_1015) / count(REG_DATE) 	end ) ) p ) 	as AVG_T_AGENT_STAT_1015_FMT 
+		, SUM(N_CALLBACK)/ count(REG_DATE)						AS AVG_N_CALLBACK       			
+		, SUM(N_RESERVATION)/ count(REG_DATE)				AS AVG_N_RESERVATION    			
+		, SUM(N_SMS)	/ count(REG_DATE)							AS AVG_N_SMS  
+	FROM(
+		SELECT 
+			 REG_DATE							
+			, REG_HOUR							
+			, EMP_NO								
+			, EMP_NM								
+			, SUM(N_INBOUND)						AS N_INBOUND        				
+			, SUM(T_INBOUND)						AS T_INBOUND        				
+	        , ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_INBOUND) 		is null then 0  else  SUM(T_INBOUND)  	end ) ) p ) 	as T_INBOUND_FMT   
+			, SUM(N_OUTBOUND)					AS N_OUTBOUND       				
+			, SUM(T_OUTBOUND)					AS T_OUTBOUND       				
+			, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_OUTBOUND) 		is null then 0  else  SUM(T_OUTBOUND)  	end ) ) p ) 	as T_OUTBOUND_FMT   	
+			, SUM(N_EXTENSION)					AS N_EXTENSION      				
+			, SUM(T_EXTENSION)					AS T_EXTENSION      			
+			, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_EXTENSION) 		is null then 0  else  SUM(T_EXTENSION)  	end ) ) p ) 	as T_EXTENSION_FMT   	
+			, SUM(T_AGENT_STAT_1011)		AS T_AGENT_STAT_1011			
+			, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_AGENT_STAT_1011) 		is null then 0  else  SUM(T_AGENT_STAT_1011)  	end ) ) p ) 	as T_AGENT_STAT_1011_FMT 
+			, SUM(T_AGENT_STAT_1012)		AS T_AGENT_STAT_1012			
+			, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_AGENT_STAT_1012) 		is null then 0  else  SUM(T_AGENT_STAT_1012)  	end ) ) p ) 	as T_AGENT_STAT_1012_FMT 
+			, SUM(T_AGENT_STAT_1013)		AS T_AGENT_STAT_1013 			
+			, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_AGENT_STAT_1013) 		is null then 0  else  SUM(T_AGENT_STAT_1013)  	end ) ) p ) 	as T_AGENT_STAT_1013_FMT 
+			, SUM(T_AGENT_STAT_1014)		AS T_AGENT_STAT_1014			
+			, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_AGENT_STAT_1014) 		is null then 0  else  SUM(T_AGENT_STAT_1014)  	end ) ) p ) 	as T_AGENT_STAT_1014_FMT 
+			, SUM(T_AGENT_STAT_1015)		AS T_AGENT_STAT_1015			
+			, ( SELECT p.RET_VALUE FROM GET_SECOND_HMS( 
+	            ( case when  SUM(T_AGENT_STAT_1015) 		is null then 0  else  SUM(T_AGENT_STAT_1015)  	end ) ) p ) 	as T_AGENT_STAT_1015_FMT 
+			, SUM(N_CALLBACK)						AS N_CALLBACK       			
+			, SUM(N_RESERVATION)				AS N_RESERVATION    			
+			, SUM(N_SMS)								AS N_SMS             	
+		FROM TAGENT_STATS_PERFORM 
+		WHERE 
+	    	1=1 
+	    		AND EMP_NM <![CDATA[<>]]> 'SuperAdmin'
+	    	<if test="leadStartDate != ''">
+				AND REG_DATE <![CDATA[>=]]> #{leadStartDate}
+			 </if>
+		  	<if test="leadEndDate != ''">
+				AND REG_DATE <![CDATA[<=]]> #{leadEndDate}
+			 </if>
+			<if test="empNm != ''">
+				AND EMP_NM = #{empNm}
+			 </if>
+		GROUP BY REG_DATE, REG_HOUR, EMP_NO, EMP_NM
+	)
+    </select> -->
+    
+    <select id="selectAgentEmpNmList" parameterType="com.coretree.defaultconfig.setting.model.Torganization" resultMap="resultMap2">
+    	SELECT EMP_NM 
+    	FROM TORGANIZATION
+    	WHERE EMP_NM  <![CDATA[<>]]> 'SuperAdmin'
+    	ORDER BY EMP_NM
+    </select>
+</mapper>

@@ -1,0 +1,319 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coretree.defaultconfig.statis.mapper.CallStatMapper">
+
+    <resultMap id="resultMap" type="com.coretree.defaultconfig.statis.model.CallStat">
+        <result property="callId"		column="call_id" />
+        <result property="regDate"		column="reg_date" />
+        <result property="regHms"		column="reg_hms" />
+        <result property="regHour"		column="reg_Hour" />
+        <result property="telNo"		column="tel_no" />
+        <result property="callTypCd"	column="call_typ_cd" />
+		<result property="agentTransYn"		column="agent_trans_yn" />
+		<result property="empNo"		column="emp_no" />
+		<result property="empNm"		column="emp_nm" />
+		<result property="callStatSec"		column="call_stat_sec" />
+		<result property="answer"		column="answer" />
+		
+		<result property="nTotIb"		column="N_TOT_IB" />
+		<result property="nTotIbAgTrans"		column="N_TOT_IB_AG_TRANS" />
+		<result property="nTotCb"		column="N_TOT_CB" />
+		<result property="nTotIbAban"		column="N_TOT_IB_ABAN" />
+		<result property="nTotOut"		column="N_TOT_OUT" />
+		<result property="nTotRes"		column="N_TOT_RES" />
+		<result property="nTotExt"		column="N_TOT_EXT" />
+		<result property="callStatstartDate"		column="callStatstartDate" />
+		<result property="callStatendDate"		column="callStatendDate" />
+		
+    </resultMap>
+	
+    <select id="selectCallStatList" parameterType="com.coretree.defaultconfig.statis.model.CallStat" resultMap="resultMap">
+	select
+      case when a.REG_DATE 			is null then b.RES_DATE 	else a.REG_DATE 			end as REG_DATE 
+    , case when a.REG_HOUR 			is null then b.RES_HOUR  	else a.REG_HOUR 			end as REG_HOUR
+    , case when a.N_TOT_IB 			is null then 0      		else a.N_TOT_IB				end as N_TOT_IB  
+    , case when a.N_TOT_IB_AG_TRANS is null then 0 				else a.N_TOT_IB_AG_TRANS 	end as N_TOT_IB_AG_TRANS
+    , case when b.N_TOT_CB 			is null then 0 				else b.N_TOT_CB 			end as N_TOT_CB      	
+    , case when a.N_TOT_IB_ABAN 	is null then 0 				else a.N_TOT_IB_ABAN 		end as N_TOT_IB_ABAN    
+    , case when a.N_TOT_OUT 		is null then 0 				else a.N_TOT_OUT 			end as N_TOT_OUT	
+    , case when N_TOT_RES 			is null then 0 				else N_TOT_RES 				end as N_TOT_RES   
+    , case when a.N_TOT_EXT 		is null then 0 				else a.N_TOT_EXT 			end as N_TOT_EXT   
+	, case when (N_TOT_IB is null) then 0 when (N_TOT_IB = 0) then 0 
+     	else cast(cast(a.N_TOT_IB_AG_TRANS as FLOAT)/ cast(a.N_TOT_IB as float) * 100 as DECIMAL(5,2)) end || '%' as ANSWER  
+	from    
+	  ( select
+		      REPLACE(SUBSTRING(STARTDATE FROM 1 FOR 10), '-', '')     					as REG_DATE							
+		    , SUBSTRING(STARTDATE FROM 12 FOR 2)					  					as REG_HOUR			
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result >= 5000 ) 	then 1 else 0 end ) as N_TOT_IB
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result =  5000 ) 	then 1 else 0 end ) as N_TOT_IB_AG_TRANS 
+		    , sum(case when (caller_type = 2 and callee_type = 0 and (result in ( 5590, 5592, 5594, 5595, 5122, 5596) ) ) then 1 else 0 end ) as N_TOT_IB_ABAN
+		    , sum(case when (caller_type = 0 and callee_type = 2 )	then 1 else 0 end ) as N_TOT_OUT   
+		    , sum(case when (caller_type = 0 and callee_type = 0 )	then 1 else 0 end ) as N_TOT_EXT   
+			<!-- CALLER_IPN_NUMBER                     			as  GEN_DIR_NO      				대표번호 -->
+			<!-- sum(case when (caller_type = 2 and callee_type = 0 and result =  5597 ) then 1 else 0 end ) as N_TOT_CB		Callback Count -->
+		from cdr
+		where 
+			1=1
+			<if test="callStatstartDate != '' and callStatendDate != ''">
+			AND STARTDATE BETWEEN	CAST(#{callStatstartDate} AS TIMESTAMP) AND CAST(#{callStatendDate} AS TIMESTAMP) 
+			</if>
+		group by SUBSTRING(STARTDATE FROM 1 FOR 10), SUBSTRING(STARTDATE FROM 12 FOR 2)		
+	  ) a full join 
+	  ( 
+	      select 
+	          case when a1.RES_DATE 	is null then b1.RES_DATE  	else a1.RES_DATE end 				as RES_DATE  	
+	        , case when a1.RES_HOUR 	is null then b1.RES_HOUR  	else a1.RES_HOUR  end 				as RES_HOUR   
+	        , case when a1.N_TOT_CB 	is null then 0        		else a1.N_TOT_CB end 				as N_TOT_CB  	
+	        , case when b1.N_TOT_RES 	is null then 0       		else b1.N_TOT_RES end 				as N_TOT_RES  
+	    from
+	      ( SELECT 
+	              RES_DATE
+	            , substring(RES_HMS from 1 for 2)	as RES_HOUR
+	            , COUNT(*) 											as N_TOT_CB
+	        FROM TCALLBACK
+	        where 
+				1=1 
+				<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+				AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+				</if>
+	        group by 	RES_DATE, substring(RES_HMS from 1 for 2)
+	      ) a1 full join 
+	      ( SELECT 
+	              RES_DATE
+	            , substring(RES_HMS from 1 for 2)	as RES_HOUR
+	            , COUNT(*) 							as N_TOT_RES
+	        FROM TRESERVATION
+	        where 		
+	        	1=1
+	        	<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+	        	AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+	        	</if>
+	        group by 	RES_DATE, substring(RES_HMS from 1 for 2)
+	      ) b1
+	    on 	a1.RES_DATE		= b1.RES_DATE
+	    and a1.RES_HOUR 	= b1.RES_HOUR
+	  ) b
+	on  a.REG_DATE	= b.RES_DATE
+	and a.REG_HOUR	= b.RES_HOUR
+	ORDER BY REG_DATE
+    </select>
+    
+   <select id="selectCallStatListDay" parameterType="com.coretree.defaultconfig.statis.model.CallStat" resultMap="resultMap">
+	select
+      case when a.REG_DATE 			is null then b.RES_DATE 	else a.REG_DATE 			end as REG_DATE 
+    , case when a.N_TOT_IB 			is null then 0      		else a.N_TOT_IB				end as N_TOT_IB  
+    , case when a.N_TOT_IB_AG_TRANS is null then 0 				else a.N_TOT_IB_AG_TRANS 	end as N_TOT_IB_AG_TRANS
+    , case when b.N_TOT_CB 			is null then 0 				else b.N_TOT_CB 			end as N_TOT_CB      	
+    , case when a.N_TOT_IB_ABAN 	is null then 0 				else a.N_TOT_IB_ABAN 		end as N_TOT_IB_ABAN    
+    , case when a.N_TOT_OUT 		is null then 0 				else a.N_TOT_OUT 			end as N_TOT_OUT	
+    , case when N_TOT_RES 			is null then 0 				else N_TOT_RES 				end as N_TOT_RES   
+    , case when a.N_TOT_EXT 		is null then 0 				else a.N_TOT_EXT 			end as N_TOT_EXT   
+	, case when (N_TOT_IB is null) then 0 when (N_TOT_IB = 0) then 0 
+     	else cast(cast(a.N_TOT_IB_AG_TRANS as FLOAT)/ cast(a.N_TOT_IB as float) * 100 as DECIMAL(5,2)) end || '%' as ANSWER  
+	from    
+	  ( select
+		      REPLACE(SUBSTRING(STARTDATE FROM 1 FOR 10), '-', '')     					as REG_DATE							
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result >= 5000 ) 	then 1 else 0 end ) as N_TOT_IB
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result =  5000 ) 	then 1 else 0 end ) as N_TOT_IB_AG_TRANS 
+		    , sum(case when (caller_type = 2 and callee_type = 0 and (result in ( 5590, 5592, 5594, 5595, 5122, 5596) ) ) then 1 else 0 end ) as N_TOT_IB_ABAN
+		    , sum(case when (caller_type = 0 and callee_type = 2 )	then 1 else 0 end ) as N_TOT_OUT   
+		    , sum(case when (caller_type = 0 and callee_type = 0 )	then 1 else 0 end ) as N_TOT_EXT   
+			<!-- CALLER_IPN_NUMBER                     			as  GEN_DIR_NO      				대표번호 -->
+			<!-- sum(case when (caller_type = 2 and callee_type = 0 and result =  5597 ) then 1 else 0 end ) as N_TOT_CB		Callback Count -->
+		from cdr
+		where 
+			1=1
+			<if test="callStatstartDate != '' and callStatendDate != ''">
+			AND STARTDATE BETWEEN	CAST(#{callStatstartDate} AS TIMESTAMP) AND CAST(#{callStatendDate} AS TIMESTAMP) 
+			</if>
+		group by SUBSTRING(STARTDATE FROM 1 FOR 10)	
+	  ) a full join 
+	  ( 
+	      select 
+	          case when a1.RES_DATE 	is null then b1.RES_DATE  	else a1.RES_DATE end 				as RES_DATE  	
+	        , case when a1.N_TOT_CB 	is null then 0        		else a1.N_TOT_CB end 				as N_TOT_CB  	
+	        , case when b1.N_TOT_RES 	is null then 0       		else b1.N_TOT_RES end 				as N_TOT_RES  
+	    from
+	      ( SELECT 
+	              RES_DATE
+	            , COUNT(*) 											as N_TOT_CB
+	        FROM TCALLBACK
+	        where 
+				1=1 
+				<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+				AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+				</if>
+	        group by 	RES_DATE
+	      ) a1 full join 
+	      ( SELECT 
+	              RES_DATE
+	            , COUNT(*) 							as N_TOT_RES
+	        FROM TRESERVATION
+	        where 		
+	        	1=1
+	        	<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+	        	AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+	        	</if>
+	        group by 	RES_DATE
+	      ) b1
+	    on 	a1.RES_DATE		= b1.RES_DATE
+	  ) b
+	on  a.REG_DATE	= b.RES_DATE
+	ORDER BY REG_DATE
+    </select>
+    
+    <select id="selectCallStatListMonth" parameterType="com.coretree.defaultconfig.statis.model.CallStat" resultMap="resultMap">
+   select
+      case when a.REG_DATE 			is null then b.RES_DATE 	else a.REG_DATE 			end as REG_DATE 
+    , case when a.N_TOT_IB 			is null then 0      		else a.N_TOT_IB				end as N_TOT_IB  
+    , case when a.N_TOT_IB_AG_TRANS is null then 0 				else a.N_TOT_IB_AG_TRANS 	end as N_TOT_IB_AG_TRANS
+    , case when b.N_TOT_CB 			is null then 0 				else b.N_TOT_CB 			end as N_TOT_CB      	
+    , case when a.N_TOT_IB_ABAN 	is null then 0 				else a.N_TOT_IB_ABAN 		end as N_TOT_IB_ABAN    
+    , case when a.N_TOT_OUT 		is null then 0 				else a.N_TOT_OUT 			end as N_TOT_OUT	
+    , case when N_TOT_RES 			is null then 0 				else N_TOT_RES 				end as N_TOT_RES   
+    , case when a.N_TOT_EXT 		is null then 0 				else a.N_TOT_EXT 			end as N_TOT_EXT   
+	, case when (N_TOT_IB is null) then 0 when (N_TOT_IB = 0) then 0 
+     	else cast(cast(a.N_TOT_IB_AG_TRANS as FLOAT)/ cast(a.N_TOT_IB as float) * 100 as DECIMAL(5,2)) end || '%' as ANSWER  
+	from    
+	  ( select
+		      REPLACE(SUBSTRING(STARTDATE FROM 1 FOR 7), '-', '')     					as REG_DATE							
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result >= 5000 ) 	then 1 else 0 end ) as N_TOT_IB
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result =  5000 ) 	then 1 else 0 end ) as N_TOT_IB_AG_TRANS 
+		    , sum(case when (caller_type = 2 and callee_type = 0 and (result in ( 5590, 5592, 5594, 5595, 5122, 5596) ) ) then 1 else 0 end ) as N_TOT_IB_ABAN
+		    , sum(case when (caller_type = 0 and callee_type = 2 )	then 1 else 0 end ) as N_TOT_OUT   
+		    , sum(case when (caller_type = 0 and callee_type = 0 )	then 1 else 0 end ) as N_TOT_EXT   
+			<!-- CALLER_IPN_NUMBER                     			as  GEN_DIR_NO      				대표번호 -->
+			<!-- sum(case when (caller_type = 2 and callee_type = 0 and result =  5597 ) then 1 else 0 end ) as N_TOT_CB		Callback Count -->
+		from cdr
+		where 
+			1=1
+			<if test="callStatstartDate != '' and callStatendDate != ''">
+			AND STARTDATE BETWEEN	CAST(#{callStatstartDate} AS TIMESTAMP)  AND CAST(#{callStatendDate} AS TIMESTAMP) 
+			</if>
+		group by SUBSTRING(STARTDATE FROM 1 FOR 7)	
+	  ) a full join 
+	  ( 
+	      select 
+	          case when a1.RES_DATE 	is null then b1.RES_DATE  	else a1.RES_DATE end 				as RES_DATE  	
+	        , case when a1.N_TOT_CB 	is null then 0        		else a1.N_TOT_CB end 				as N_TOT_CB  	
+	        , case when b1.N_TOT_RES 	is null then 0       		else b1.N_TOT_RES end 				as N_TOT_RES  
+	    from
+	      ( SELECT 
+	              SUBSTRING(RES_DATE FROM 1 FOR 6) AS RES_DATE
+	            , COUNT(*) 											as N_TOT_CB
+	        FROM TCALLBACK
+	        where 
+				1=1 
+				<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+				AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+				</if>
+	        group by 	SUBSTRING(RES_DATE FROM 1 FOR 6)
+	      ) a1 full join 
+	      ( SELECT 
+	               SUBSTRING(RES_DATE FROM 1 FOR 6) AS RES_DATE
+	            , COUNT(*) 							as N_TOT_RES
+	        FROM TRESERVATION
+	        where 		
+	        	1=1
+	        	<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+	        	AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+	        	</if>
+	        group by 	SUBSTRING(RES_DATE FROM 1 FOR 6)
+	      ) b1
+	    on 	a1.RES_DATE		= b1.RES_DATE
+	  ) b
+	on  a.REG_DATE	= b.RES_DATE
+	ORDER BY REG_DATE
+    </select>
+    
+     <select id="selectCallStatListYear" parameterType="com.coretree.defaultconfig.statis.model.CallStat" resultMap="resultMap">
+   select
+      case when a.REG_DATE 			is null then b.RES_DATE 	else a.REG_DATE 			end as REG_DATE 
+    , case when a.N_TOT_IB 			is null then 0      		else a.N_TOT_IB				end as N_TOT_IB  
+    , case when a.N_TOT_IB_AG_TRANS is null then 0 				else a.N_TOT_IB_AG_TRANS 	end as N_TOT_IB_AG_TRANS
+    , case when b.N_TOT_CB 			is null then 0 				else b.N_TOT_CB 			end as N_TOT_CB      	
+    , case when a.N_TOT_IB_ABAN 	is null then 0 				else a.N_TOT_IB_ABAN 		end as N_TOT_IB_ABAN    
+    , case when a.N_TOT_OUT 		is null then 0 				else a.N_TOT_OUT 			end as N_TOT_OUT	
+    , case when N_TOT_RES 			is null then 0 				else N_TOT_RES 				end as N_TOT_RES   
+    , case when a.N_TOT_EXT 		is null then 0 				else a.N_TOT_EXT 			end as N_TOT_EXT   
+	, case when (N_TOT_IB is null) then 0 when (N_TOT_IB = 0) then 0 
+     	else cast(cast(a.N_TOT_IB_AG_TRANS as FLOAT)/ cast(a.N_TOT_IB as float) * 100 as DECIMAL(5,2)) end || '%' as ANSWER  
+	from    
+	  ( select
+		      REPLACE(SUBSTRING(STARTDATE FROM 1 FOR 4), '-', '')     					as REG_DATE							
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result >= 5000 ) 	then 1 else 0 end ) as N_TOT_IB
+		    , sum(case when (caller_type = 2 and callee_type = 0 and result =  5000 ) 	then 1 else 0 end ) as N_TOT_IB_AG_TRANS 
+		    , sum(case when (caller_type = 2 and callee_type = 0 and (result in ( 5590, 5592, 5594, 5595, 5122, 5596) ) ) then 1 else 0 end ) as N_TOT_IB_ABAN
+		    , sum(case when (caller_type = 0 and callee_type = 2 )	then 1 else 0 end ) as N_TOT_OUT   
+		    , sum(case when (caller_type = 0 and callee_type = 0 )	then 1 else 0 end ) as N_TOT_EXT   
+			<!-- CALLER_IPN_NUMBER                     			as  GEN_DIR_NO      				대표번호 -->
+			<!-- sum(case when (caller_type = 2 and callee_type = 0 and result =  5597 ) then 1 else 0 end ) as N_TOT_CB		Callback Count -->
+		from cdr
+		where 
+			1=1
+			<if test="callStatstartDate != '' and callStatendDate != ''">
+			AND STARTDATE BETWEEN	CAST(#{callStatstartDate} AS TIMESTAMP) AND CAST(#{callStatendDate} AS TIMESTAMP) 
+			</if>
+		group by SUBSTRING(STARTDATE FROM 1 FOR 4)	
+	  ) a full join 
+	  ( 
+	      select 
+	          case when a1.RES_DATE 	is null then b1.RES_DATE  	else a1.RES_DATE end 				as RES_DATE  	
+	        , case when a1.N_TOT_CB 	is null then 0        		else a1.N_TOT_CB end 				as N_TOT_CB  	
+	        , case when b1.N_TOT_RES 	is null then 0       		else b1.N_TOT_RES end 				as N_TOT_RES  
+	    from
+	      ( SELECT 
+	              SUBSTRING(RES_DATE FROM 1 FOR 4) AS RES_DATE
+	            , COUNT(*) 											as N_TOT_CB
+	        FROM TCALLBACK
+	        where 
+				1=1 
+				<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+				AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+				</if>
+	        group by 	 SUBSTRING(RES_DATE FROM 1 FOR 4)
+	      ) a1 full join 
+	      ( SELECT 
+	              SUBSTRING(RES_DATE FROM 1 FOR 4) AS RES_DATE
+	            , COUNT(*) 							as N_TOT_RES
+	        FROM TRESERVATION
+	        where 		
+	        	1=1
+	        	<if test="callStatstartDate2 != '' and callStatendDate2 != ''">
+	        	AND RES_DATE Between  #{callStatstartDate2} and #{callStatendDate2}
+	        	</if>
+	        group by 	 SUBSTRING(RES_DATE FROM 1 FOR 4)
+	      ) b1
+	    on 	a1.RES_DATE		= b1.RES_DATE
+	  ) b
+	on  a.REG_DATE	= b.RES_DATE
+	ORDER BY REG_DATE
+    </select>
+    
+    <insert id="insertCallStat" parameterType="com.coretree.defaultconfig.statis.model.CallStat">
+    	insert into TCALL_STAT (
+    		CALLID
+    		, REG_DATE
+    		, REG_HMS
+    		, TEL_NO
+    		, CALL_TYP_CD
+    		, EMP_NO
+    		, EMP_NM
+    	) values (
+    		#{callId}
+    		, #{regDate}
+    		, #{regHms}
+    		, #{telNo}
+    		, #{callTypCd}
+    		, #{empNo}
+    		, (select emp_nm from TORGANIZATION where emp_no=#{empNo})
+    	)
+    </insert>
+    
+    <update id="updateCallStatMid" parameterType="com.coretree.defaultconfig.statis.model.CallStat">
+    	update TCALL_STAT set AGENT_TRANS_YN=#{agentTransYn} where CALLID=#{callId}
+    </update>
+    
+    <update id="updateCallStatEnd" parameterType="com.coretree.defaultconfig.statis.model.CallStat">
+    	update TCALL_STAT set AGENT_TRANS_YN=#{agentTransYn}, CALL_STAT_SEC=#{callStatSec} where CALLID=#{callId}
+    </update>
+</mapper>

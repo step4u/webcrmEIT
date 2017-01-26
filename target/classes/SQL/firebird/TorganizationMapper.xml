@@ -1,0 +1,88 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coretree.defaultconfig.setting.mapper.TorganizationMapper">
+
+    <resultMap id="resultMap" type="com.coretree.defaultconfig.setting.model.Torganization">
+        <result property="empNo"		column="emp_no" />
+        <result property="empNm"		column="emp_nm" />
+        <result property="grpCd"		column="grp_cd" />
+        <result property="enterDate"		column="enter_date" />
+		<result property="mobilePhoneNo"		column="mobile_phoneno" />
+		<result property="emailId"		column="emailid" />
+		<result property="extensionNo"		column="extension_no" />
+		<result property="password"		column="password" />
+		<result property="note"		column="note" />
+		<result property="role"		column="role" />
+    </resultMap>
+	
+    <select id="selectCouncellerList" parameterType="com.coretree.defaultconfig.setting.model.Torganization" resultMap="resultMap">
+    	select 
+	 		EMP_NO
+	 		,case when EMP_NM is null then '' else EMP_NM end as EMP_NM
+	 		,case when GRP_CD is null then '' else GRP_CD end as GRP_CD
+			,case when (SELECT * FROM GET_FORMAT_DATE(ENTER_DATE) p ) is null then '' else (SELECT * FROM GET_FORMAT_DATE(ENTER_DATE) p ) end as ENTER_DATE
+			,case when MOBILE_PHONENO is null then '' else MOBILE_PHONENO end as MOBILE_PHONENO
+			,case when EMAILID is null then '' else EMAILID end as EMAILID
+			,case when EXTENSION_NO is null then '' else EXTENSION_NO end as EXTENSION_NO 
+			,PASSWORD
+			,case when NOTE is null then '' else NOTE end as NOTE 
+			,case when ROLE is null then '' else ROLE end as ROLE 
+		from TORGANIZATION
+		where EMP_NO <![CDATA[<>]]> 'superadmin' 
+		ORDER BY EMP_NO, EMP_NM
+    </select>
+    
+    <delete id="deleteCounceller" parameterType="com.coretree.defaultconfig.setting.model.Torganization" >
+      	delete from TORGANIZATION 
+      	WHERE EMP_NO in
+		<foreach collection="empNos" item="empNo" open="(" separator="," close=")">
+			#{empNo}
+		</foreach>
+    </delete>
+    
+    <update id="updateCounceller" parameterType="com.coretree.defaultconfig.setting.model.Torganization" >
+    	update TORGANIZATION set PASSWORD <![CDATA[=]]> #{password}
+    	WHERE EMP_NO in
+		<foreach collection="empNos" item="empNo" open="(" separator="," close=")">
+			#{empNo}
+		</foreach>
+    </update>
+    
+    <insert id="insertCounceller" >
+		INSERT INTO TORGANIZATION
+		(EMP_NO, EMP_NM, GRP_CD, ENTER_DATE, MOBILE_PHONENO, EMAILID,  EXTENSION_NO, "PASSWORD", NOTE, ROLE, ENABLE) 
+		VALUES 
+		(#{empNo}, #{empNm}, '1001', #{enterDate}, #{mobilePhoneNo}, #{emailId},  #{extensionNo}, #{password}, #{note}, #{role}, 1);
+    </insert>
+    
+    <update id="updateDataCounceller" parameterType="com.coretree.defaultconfig.setting.model.Torganization" >
+    UPDATE 
+	  TORGANIZATION  
+	SET 
+	  EMP_NM = #{empNm},
+	  EXTENSION_NO = #{extensionNo},
+	  MOBILE_PHONENO = #{mobilePhoneNo},
+	  EMAILID = #{emailId},
+	  NOTE = #{note},
+	  ROLE = #{role}
+	WHERE 
+		EMP_NO = #{empNo}
+    </update>
+    
+    <select id="councellerExtensionChk" parameterType="com.coretree.defaultconfig.setting.model.Torganization" resultType="java.lang.Long">
+    	select 
+			COUNT(case when EXTENSION_NO is null then '' else EXTENSION_NO end) as EXTENSION_NO 
+		from TORGANIZATION
+		where 
+			EMP_NO <![CDATA[<>]]> 'superadmin'
+			AND EXTENSION_NO = #{extensionNo} 
+    </select>
+    
+    <select id="councellerNameChk" parameterType="com.coretree.defaultconfig.setting.model.Torganization" resultType="java.lang.Long">
+    	select 
+			COUNT(case when EMP_NM is null then '' else EMP_NM end) as EMP_NM 
+		from TORGANIZATION
+		where 
+			EMP_NO <![CDATA[<>]]> 'superadmin'
+			AND EMP_NM = #{empNm} 
+    </select>
+</mapper>

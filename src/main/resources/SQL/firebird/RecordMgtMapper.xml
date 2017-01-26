@@ -1,0 +1,55 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coretree.defaultconfig.statis.mapper.RecordMgtMapper">
+
+    <resultMap id="resultMap" type="com.coretree.defaultconfig.statis.model.RecordMgt">
+        <result property="recSeq"		column="rec_seq" />
+        <result property="extensionNo"		column="extension_no" />
+        <result property="empNo"		column="emp_no" />
+        <result property="telNo"		column="tel_no" />
+        <result property="callTypCd"		column="call_typ_cd" />
+		<result property="recStartDate"		column="rec_start_date" />
+		<result property="recStartHms"		column="rec_start_hms" />
+		<result property="recEndDate"		column="rec_end_date" />
+		<result property="recEndHms"		column="rec_end_hms" />
+		<result property="fileSize"		column="file_size" />
+		<result property="fileName"		column="file_name" />
+		<result property="callId"		column="callid" />
+		<result property="startDate"	column="startDate" />
+		<result property="endDate"		column="endDate" />
+    </resultMap>
+	
+    <select id="selectRecordList" parameterType="com.coretree.defaultconfig.statis.model.RecordMgt" resultMap="resultMap">
+		SELECT	 
+		 case when REC_SEQ is null then '' else REC_SEQ end as REC_SEQ
+		 ,case when EXTENSION_NO is null then '' else EXTENSION_NO end as EXTENSION_NO
+		 ,case when EMP_NO is null then '' else EMP_NO end as EMP_NO	
+		 ,case when TEL_NO is null then '' else TEL_NO end as TEL_NO	
+		 ,case when ( SELECT * FROM GET_CODE_NAME('1006', CALL_TYP_CD) p ) is null then '' else ( SELECT * FROM GET_CODE_NAME('1006', CALL_TYP_CD) p ) end as CALL_TYP_CD
+		 ,case when ( SELECT * FROM GET_FORMAT_DATE(REC_START_DATE) p ) is null then '' else ( SELECT * FROM GET_FORMAT_DATE(REC_START_DATE) p ) end as REC_START_DATE
+		 ,case when ( SELECT * FROM GET_FORMAT_HMS(REC_START_HMS) p ) is null then '' else ( SELECT * FROM GET_FORMAT_HMS(REC_START_HMS) p ) end as REC_START_HMS
+		 ,case when ( SELECT * FROM GET_FORMAT_DATE(REC_END_DATE) p ) is null then '' else ( SELECT * FROM GET_FORMAT_DATE(REC_END_DATE) p ) end as RESERVE_DATE
+		 ,case when ( SELECT * FROM GET_FORMAT_HMS(REC_END_HMS) p ) is null then '' else ( SELECT * FROM GET_FORMAT_HMS(REC_END_HMS) p ) end as REC_END_HMS
+		 ,case when FILE_SIZE is null then 0 else FILE_SIZE end as FILE_SIZE
+ 		 ,case when FILE_NAME is null then '' else FILE_NAME end as FILE_NAME
+ 		 ,case when CALLID is null then '' else CALLID end as CALLID
+		FROM TRECORD_MGT
+		WHERE
+			1=1
+		 <if test="startDate != '' and endDate != ''">
+			AND REC_START_DATE BETWEEN #{startDate} AND #{endDate}
+		 </if>
+		 <if test="tmptelNo != ''">
+		 	AND TEL_NO = #{tmptelNo}
+		 </if>
+		 <if test="callTypCd != ''">
+		 	AND CALL_TYP_CD = #{callTypCd}
+		 </if> 
+		 <if test="extensionNo != ''">
+		 	AND EXTENSION_NO = #{extensionNo}
+		 </if>
+		ORDER BY REC_START_DATE DESC, REC_START_HMS DESC
+    </select>
+    <select id="getRecFn" parameterType="java.lang.Integer"  resultMap="resultMap">
+    	select rec_start_date, file_name from trecord_mgt where rec_seq=#{seq}
+    </select>
+</mapper>

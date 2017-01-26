@@ -1,0 +1,70 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coretree.defaultconfig.statis.mapper.IvrCallMapper">
+
+    <resultMap id="resultMap" type="com.coretree.defaultconfig.statis.model.IvrCall">
+        <result property="inboundDate"		column="INBOUND_DATE" />
+        <result property="inboudHms"		column="INBOUND_HMS" />
+        <result property="genDirNo"		column="GEN_DIR_NO" />
+        <result property="telNo"		column="TEL_NO" />
+		<result property="agentContactYN"		column="AGENT_CONTACT_YN" />
+		<result property="callbackSuccessYN"		column="CALLBACK_SUCCESS_YN" />
+		<result property="abandonYN"		column="ABANDON_YN" />
+		<result property="empNo"		column="EMP_NO" />
+		<result property="empNm"		column="EMP_NM" />
+		<result property="ivrstartDate"	column="ivrstartDate" />
+		<result property="ivrendDate"		column="ivrendDate" />
+    </resultMap>
+	
+<!--     <select id="selectIvrList" parameterType="com.coretree.defaultconfig.statis.model.IvrCall" resultMap="resultMap">
+		select 
+			  REPLACE(SUBSTRING(STARTDATE FROM 1 FOR 10), '-', '') 		AS INBOUND_DATE		
+			, REPLACE(SUBSTRING(STARTDATE FROM 12 FOR 8), ':', '') 		AS INBOUND_HMS			
+			, CALLEE_IPN_NUMBER 		as GEN_DIR_NO		
+			, CALLER 					as TEL_NO				
+			, case when (CALLEE	<![CDATA[<>]]> '8888' and RESULT = 5000) then 'Y'	else '' 	end as 		AGENT_CONTACT_YN		
+			, case when (CALLEE	= '8888' and RESULT = 5000) then 'Y' 	else '' 	end as 		CALLBACK_SUCCESS_YN		
+			, case when (CALLEE	= '8888' and RESULT <![CDATA[>]]> 5000) then 'Y' 	else '' 	end as 		ABANDON_YN						
+			, EMP_NO		
+			, EMP_NM	
+		FROM CDR
+		WHERE 
+			1=1
+			AND CALLEE_TYPE	<![CDATA[=]]>	0  
+			AND CALLER_TYPE	<![CDATA[=]]>	2
+			AND RESULT		<![CDATA[>=]]>	5000
+			<if test="ivrstartDate != '' and ivrendDate != ''">
+			AND STARTDATE BETWEEN	CAST(#{ivrstartDate} AS TIMESTAMP) AND CAST(#{ivrendDate} AS TIMESTAMP)  
+			</if>
+			<if test="tmptelNo != ''">
+		 	AND CALLER <![CDATA[=]]> #{tmptelNo}
+			</if>
+		ORDER BY STARTDATE DESC
+    </select> -->
+    
+   <select id="selectIvrList" parameterType="com.coretree.defaultconfig.statis.model.IvrCall" resultMap="resultMap">
+		SELECT 
+		REPLACE(SUBSTRING(STARTDATE FROM 1 FOR 10), '-', '') 		AS INBOUND_DATE	
+		, REPLACE(SUBSTRING(STARTDATE FROM 12 FOR 8), ':', '') 		AS INBOUND_HMS	
+		, callee_ipn_number as GEN_DIR_NO
+		, caller as TEL_NO
+		, case when (result <![CDATA[=]]> 5000) then 'Y' else '' end as AGENT_CONTACT_YN
+		, case when (result <![CDATA[=]]> 5597) then 'Y' else '' end as CALLBACK_SUCCESS_YN
+		, case when (result <![CDATA[>]]> 5000 and result <![CDATA[<>]]> 5597) then 'Y' else '' end as ABANDON_YN
+		, case when (result <![CDATA[>]]> 5000 and result <![CDATA[<>]]> 5597) then '' else emp_no end as EMP_NO
+		, case when (result <![CDATA[>]]> 5000 and result <![CDATA[<>]]> 5597) then '' else emp_nm end as EMP_NM
+		FROM CDR
+		WHERE
+		1=1
+			AND CALLEE_TYPE	<![CDATA[=]]>	0  
+			AND CALLER_TYPE	<![CDATA[=]]>	2
+			AND RESULT		<![CDATA[>=]]>	5000
+		<if test="ivrstartDate != '' and ivrendDate != ''">
+			AND STARTDATE BETWEEN	CAST(#{ivrstartDate} AS TIMESTAMP) AND CAST(#{ivrendDate} AS TIMESTAMP)  
+		</if>
+		<if test="tmptelNo != ''">
+	 		AND CALLER <![CDATA[=]]> #{tmptelNo}
+		</if>
+		ORDER BY STARTDATE DESC
+    </select>
+    
+</mapper>

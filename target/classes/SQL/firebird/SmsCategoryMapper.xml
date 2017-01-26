@@ -1,0 +1,61 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coretree.defaultconfig.setting.mapper.SmsCategoryMapper">
+
+    <resultMap id="resultMap" type="com.coretree.defaultconfig.setting.model.SmsCategory">
+        <result property="cateCd"		column="CATE_CD" />
+        <result property="cateNm"		column="CATE_NM" />
+        <result property="cateComment"		column="CATE_COMMENT" />
+    </resultMap>
+	
+    <select id="selectSmsList" resultMap="resultMap">
+		SELECT 
+			case when SCD is null then '' else SCD end as CATE_CD
+			,case when SCD_NM is null then '' else SCD_NM end as CATE_NM
+			,case when NOTE is null then '' else NOTE end as CATE_COMMENT
+		FROM 
+		  TCODE_SMALL
+		WHERE LCD = '1003'
+		ORDER BY SCD
+    </select>
+    
+    <select id="maxSms" resultMap="resultMap">
+		SELECT MAX(SCD) as CATE_CD FROM TCODE_SMALL
+		WHERE LCD = '1003'
+    </select>
+    
+   <select id="selectSmsOne" parameterType="com.coretree.defaultconfig.setting.model.SmsCategory" resultMap="resultMap">
+		SELECT 
+		  case when SCD is null then '' else SCD end as CATE_CD
+		  ,case when SCD_NM is null then '' else SCD_NM end as CATE_NM
+		  ,replace (NOTE,  '{}', #{customName}) AS CATE_COMMENT
+		FROM 
+		  TCODE_SMALL
+		 WHERE SCD = #{cateCd} AND LCD = '1003'
+    </select>
+    
+    <insert id="insertSms">
+    	INSERT INTO TCODE_SMALL(LCD, SCD, SCD_NM, NOTE) 
+		VALUES ('1003', #{cateCd}, #{cateNm}, #{cateComment})
+    </insert>
+    
+    <delete id="deleteSms">
+        delete from TCODE_SMALL 
+      	WHERE 
+      	LCD = '1003' 
+      	AND SCD in
+		<foreach collection="cateCds" item="cateCd" open="(" separator="," close=")">
+			#{cateCd}
+		</foreach>
+    </delete>
+    
+    <update id="updateSms" parameterType="com.coretree.defaultconfig.setting.model.SmsCategory" >
+	UPDATE 
+	  TCODE_SMALL  
+	SET 
+	  SCD_NM = #{cateNm},
+	  NOTE = #{cateComment}
+	WHERE
+		LCD = '1003'  
+		AND SCD = #{cateCd}
+    </update>
+</mapper>

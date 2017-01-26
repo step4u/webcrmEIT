@@ -1,0 +1,21 @@
+{
+  "groups": [
+    {
+      "name": "spring.datasource",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.coretree.defaultconfig.config.ApplicationConfigureAdapter",
+      "sourceMethod": "public javax.sql.DataSource primaryDataSource() "
+    },
+    {
+      "name": "uc",
+      "type": "com.coretree.defaultconfig.azure.WebUcServiceConfig",
+      "sourceType": "com.coretree.defaultconfig.azure.WebUcServiceConfig"
+    }
+  ],
+  "properties": [{
+    "name": "uc.pbxip",
+    "type": "java.lang.String",
+    "sourceType": "com.coretree.defaultconfig.azure.WebUcServiceConfig"
+  }],
+  "hints": []
+}
